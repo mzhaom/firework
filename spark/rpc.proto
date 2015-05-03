@@ -1,0 +1,19 @@
+syntax = "proto2";
+
+package spark;
+
+message CreateTunnelRequest {
+  optional string username = 1;
+};
+
+message CreateTunnelReply {
+  // IP to be assigned to the client
+  required string ip = 1;
+  // IP of the peer
+  required string peer_ip = 2;
+};
+
+service Spark {
+  rpc CreateTunnel(CreateTunnelRequest) returns (CreateTunnelReply) {
+  }
+}
