@@ -29,7 +29,22 @@ cc_library(
   deps = [
     ":rpc",
     ":tun",
+    ":packet-core",
   ],
+)
+
+cc_library(
+  name = "packet-core",
+  hdrs = [
+    "packet-stream.h",
+  ],
+  srcs = [
+    "packet-stream.cc",
+  ],
+  deps = [
+    ":rpc",
+    ":tun",
+  ]
 )
 
 # server

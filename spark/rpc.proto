@@ -8,12 +8,23 @@ message CreateTunnelRequest {
 
 message CreateTunnelReply {
   // IP to be assigned to the client
-  required string ip = 1;
+  optional string ip = 1;
   // IP of the peer
-  required string peer_ip = 2;
+  optional string peer_ip = 2;
+};
+
+message Packet {
+  // IP Packet
+  optional bytes payload = 1;
+};
+
+message Bullet {
+  optional CreateTunnelRequest create_tunnel_request = 1;
+  optional CreateTunnelReply create_tunnel_reply = 2;
+  optional Packet packet = 3;
 };
 
 service Spark {
-  rpc CreateTunnel(CreateTunnelRequest) returns (CreateTunnelReply) {
+  rpc CreateTunnel(stream Bullet) returns (stream Bullet) {
   }
 }

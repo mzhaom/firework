@@ -79,7 +79,8 @@ Tun::~Tun() {
 void Tun::Configure(const std::string& my_ip,
                     const std::string& peer_ip) {
   Subprocess proc(std::vector<std::string>({
-        "/sbin/ip", "addr add dev", name_, "local", my_ip, "peer", peer_ip}));
+        "/sbin/ip", "addr", "add", "dev", name_,
+"local", my_ip, "peer", peer_ip}));
   CHECK_EQ(0, proc.wait().exitStatus()) << "Failed to configure IP for tun device";
 }
 

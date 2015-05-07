@@ -14,9 +14,9 @@ class SparkService : public Spark::Service {
 
   ~SparkService();
 
-  virtual grpc::Status CreateTunnel(grpc::ServerContext* context,
-                                    const CreateTunnelRequest* request, 
-                                    CreateTunnelReply* response);
+  virtual grpc::Status CreateTunnel(
+      grpc::ServerContext* context,
+      grpc::ServerReaderWriter<Bullet, Bullet>* stream);
 
  private:
   const std::string my_ip_;  // My IP address on the VPN connection
