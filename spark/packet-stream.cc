@@ -22,7 +22,9 @@ void PacketStream::DrainStream() {
   while (reader_->Read(&b)) {
     if (b.has_packet()) {
       const auto& p = b.packet().payload();
-      write(tun_->fd(), p.data(), p.size());
+      if (write(tun_->fd(), p.data(), p.size()) <= 0) {
+        break;
+      }
     }
   }
 }
