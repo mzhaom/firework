@@ -21,9 +21,11 @@ class PacketStream {
 
  private:
   void DrainStream();
+  void DrainTun();
 
   std::unique_ptr<Tun> tun_;
   grpc::ReaderInterface<Bullet>* const reader_;
   grpc::WriterInterface<Bullet>* const writer_;
+  bool closing_;
 };
 };

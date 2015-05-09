@@ -10,14 +10,15 @@ PacketStream::PacketStream(Tun* tun,
                            grpc::WriterInterface<Bullet>* writer)
     : tun_(tun),
       reader_(reader),
-      writer_(writer) {
+      writer_(writer),
+      closing(false) {
 }
       
 PacketStream::~PacketStream() {
 }
 
 void PacketStream::DrainStream() {
-  LOG(INFO) << "Running";
+  LOG(INFO) << "Drain stream";
   Bullet b;
   while (reader_->Read(&b)) {
     if (b.has_packet()) {
@@ -27,16 +28,25 @@ void PacketStream::DrainStream() {
       }
     }
   }
+  LOG(INFO) << "Stream is closed";
+  closing_ = true;
 }
+
 void PacketStream::Run() {
   std::thread stream_read_thread([this]() {
-      DrainStream();
+      DrainTun();
     });
+  DrainStream();
+  stream_read_thread.join();
+  LOG(INFO) << "Exit";
+}
+
+void PacketStream::DrainTun() {
   // Block the current thread to read from tun.
   const int kMTU = 1500;
   char buffer[kMTU];
   Bullet b;
-  while (true) {
+  while (!closing_) {
     ssize_t len = read(tun_->fd(), buffer, kMTU);
     DLOG(INFO) << "Read " << len;
     if (len == -1) {
@@ -56,8 +66,7 @@ void PacketStream::Run() {
       break;
     }
   }
-  stream_read_thread.join();
-  LOG(INFO) << "Exit";
+  closing_ = true;
 }
 
 }
