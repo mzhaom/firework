@@ -1,0 +1,6 @@
+{
+  "keystore": "keystore",
+  "C" : "CN",
+  "organization": "SkyWalker",
+  "ca_name": "Test IPsec CA"
+}
