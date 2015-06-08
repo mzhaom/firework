@@ -32,7 +32,7 @@ def run_pki_command(output_file, *args):
 
 def generate_key(fname):
     '''Generate RSA stored in the given PEM file'''
-    run_pki_command(fname, '--gen', 'outform', 'pem')
+    run_pki_command(fname, '--gen', '--outform', 'pem')
 
 
 def maybe_check_non_exists(args, *files):
@@ -44,8 +44,8 @@ def maybe_check_non_exists(args, *files):
 def init_ca(args, config):
     if not os.path.isdir(config.keystore):
         os.makedirs(config.keystore)
-    ca_key = os.path.join(config.keystore, 'caKey.pem')
-    ca_cert = os.path.join(config.keystore, 'caCert.pem')
+    ca_key = os.path.join(config.keystore, 'ca.key.pem')
+    ca_cert = os.path.join(config.keystore, 'ca.cert.pem')
     maybe_check_non_exists(args, ca_key, ca_cert)
     generate_key(ca_key)
     run_pki_command(ca_cert, '--self', '--in',
@@ -56,8 +56,8 @@ def init_ca(args, config):
 
 def issue_cert(config, private_key_file,
                cert_file, *args):
-    ca_key = os.path.join(config.keystore, 'caKey.pem')
-    ca_cert = os.path.join(config.keystore, 'caCert.pem')
+    ca_key = os.path.join(config.keystore, 'ca.key.pem')
+    ca_cert = os.path.join(config.keystore, 'ca.cert.pem')
     with open(cert_file, 'w') as fp:
         pubkey_proc = subprocess.Popen(['pki', '--pub', '--in', private_key_file],
                                        stdout = subprocess.PIPE)
@@ -89,11 +89,17 @@ def export_p12(args, config):
     key_file = os.path.join(config.keystore, args.common_name + '.key.pem')
     p12_file = os.path.join(config.keystore, args.common_name + '.p12')
     cert_file = os.path.join(config.keystore, args.common_name + '.cert.pem')
-    ca_cert = os.path.join(config.keystore, 'caCert.pem')
+    ca_cert = os.path.join(config.keystore, 'ca.cert.pem')
     subprocess.check_call(
-        ['openssl', 'pkcs12', '-export', '-inkey', key_file,
-         '-in', cert_file, '-name', args.common_name,
-         '-certfile', ca_cert, '-caname', config.ca_name,
+        ['openssl', 'pkcs12', '-export',
+         '-inkey', key_file,
+         '-in', cert_file,
+         '-name', args.common_name,
+         # It doesn't seem necessary to include ca cert in p12. At
+         # least for IOS client.
+
+         # '-certfile', ca_cert,
+         # '-caname', config.ca_name,
          '-out', p12_file])
     print('Generated pkcs 12 file in ' + p12_file)
 
@@ -108,7 +114,8 @@ def add_client(args, config):
     print('Generated cert for %s in %s' % (
         args.common_name,
         client_cert))
-    export_p12(args, config)
+    if args.p12:
+        export_p12(args, config)
 
 
 def main():
@@ -133,6 +140,8 @@ def main():
                                help='Create a certificate for the given client')
     sp.add_argument('--common-name', required=True,
                     help='Id of the user, usually this could be the email address')
+    sp.add_argument('--p12', action='store_true',
+                    help='If set, create PKCS#12 file for the generated key')
     sp = subparsers.add_parser('export_p12',
                                help='Export PKCS 12 file for the given client/server')
     sp.add_argument('--common-name', required=True,
