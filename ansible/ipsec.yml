@@ -4,3 +4,10 @@
   sudo: yes
   tasks:
     - include: tasks/strongswan.yml
+  handlers:
+    - name: enable-iptables-nat
+      service: name=iptables-nat state=restarted enabled=yes
+
+    - name: restart-strongswan
+      service: name=strongswan state=restarted enabled=yes
+

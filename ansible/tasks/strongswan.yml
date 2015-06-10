@@ -6,8 +6,12 @@
     - strongswan-plugin-xauth-noauth
     - strongswan-plugin-xauth-generic
 
+- name: enable strongswan service
+  service: name=strongswan enabled=yes
+
 - name: copy strongswan.conf
   copy: src=strongswan/strongswan.conf dest=/etc/strongswan.conf owner=root group=root mode=0644
+  notify: restart-strongswan
 
 - name: copy root cert
   tags: cert
@@ -29,7 +33,12 @@
   tags: config
   template: src=strongswan/ipsec.secrets.j2 dest=/etc/ipsec.secrets owner=root group=root mode=0600
 
-# ---
-# handles:
-#   - name: restart-strongswan
-#     service: name=strongswan state=restarted enabled=yes
+- name: enable IP forward
+  sysctl: name=net.ipv4.ip_forward value=1 state=present
+
+- name: enable NAT
+  template: src=strongswan/iptables-nat.sh.j2 dest=/etc/init.d/iptables-nat owner=root group=root mode=755
+  notify: enables-iptables-nat
+
+- name: enable iptables-nat service
+  service: name=iptables-nat enabled=yes
