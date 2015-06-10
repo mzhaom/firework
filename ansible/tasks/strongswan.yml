@@ -10,7 +10,7 @@
   service: name=strongswan enabled=yes
 
 - name: copy strongswan.conf
-  copy: src=strongswan/strongswan.conf dest=/etc/strongswan.conf owner=root group=root mode=0644
+  template: src=strongswan/strongswan.conf dest=/etc/strongswan.conf owner=root group=root mode=0644
   notify: restart-strongswan
 
 - name: copy root cert
