@@ -1,0 +1,6 @@
+---
+- hosts: ipsec
+  gather_facts: no
+  sudo: yes
+  tasks:
+    - include: tasks/strongswan.yml

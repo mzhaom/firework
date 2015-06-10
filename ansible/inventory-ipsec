@@ -1,0 +1,17 @@
+[azure]
+hgate.cloudapp.net
+
+[azure:vars]
+ipsec_dns_name=hgate.cloudapp.net
+ipsec_subnet=192.168.8.0/24
+
+[cn]
+rtclab.cn
+
+[cn:vars]
+ipsec_dns_name=rtclab.cn
+ipsec_subnet=192.168.8.0/24
+
+[ipsec:children]
+azure
+cn

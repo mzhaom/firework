@@ -1,0 +1,35 @@
+---
+- name: Install strongswan
+  apt: pkg={{item}} state=installed force=yes
+  with_items:
+    - strongswan
+    - strongswan-plugin-xauth-noauth
+    - strongswan-plugin-xauth-generic
+
+- name: copy strongswan.conf
+  copy: src=strongswan/strongswan.conf dest=/etc/strongswan.conf owner=root group=root mode=0644
+
+- name: copy root cert
+  tags: cert
+  copy: src=../spark/scripts/keystore/ca.cert.pem dest=/etc/ipsec.d/cacerts/ca.cert.pem owner=root group=root mode=0644
+
+- name: copy strongswan service cert
+  tags: cert
+  copy: src=../spark/scripts/keystore/{{ ipsec_dns_name }}.cert.pem dest=/etc/ipsec.d/certs/{{ ipsec_dns_name }}.cert.pem owner=root group=root mode=0644
+
+- name: copy strongswan service key
+  tags: cert
+  copy: src=../spark/scripts/keystore/{{ ipsec_dns_name }}.key.pem dest=/etc/ipsec.d/private/{{ ipsec_dns_name }}.key.pem owner=root group=root mode=0644
+
+- name: fill ipsec.conf
+  tags: config
+  template: src=strongswan/ipsec.conf.j2 dest=/etc/ipsec.conf owner=root group=root mode=0664
+
+- name: fill ipsec.secrets
+  tags: config
+  template: src=strongswan/ipsec.secrets.j2 dest=/etc/ipsec.secrets owner=root group=root mode=0600
+
+# ---
+# handles:
+#   - name: restart-strongswan
+#     service: name=strongswan state=restarted enabled=yes
