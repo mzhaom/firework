@@ -97,9 +97,8 @@ def export_p12(args, config):
          '-name', args.common_name,
          # It doesn't seem necessary to include ca cert in p12. At
          # least for IOS client.
-
-         # '-certfile', ca_cert,
-         # '-caname', config.ca_name,
+         '-certfile', ca_cert,
+         '-caname', config.ca_name,
          '-out', p12_file])
     print('Generated pkcs 12 file in ' + p12_file)
 
