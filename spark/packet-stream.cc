@@ -1,5 +1,6 @@
 #include "spark/packet-stream.h"
 
+#include <poll.h>
 #include <thread>
 #include "glog/logging.h"
 
@@ -47,6 +48,24 @@ void PacketStream::DrainTun() {
   char buffer[kMTU];
   Bullet b;
   while (!closing_) {
+    // Wait until the sock is readable every 1 second, close() can't
+    // interrupt a blocking read.
+    {
+      pollfd pfd;
+      pfd.fd = tun_->fd();
+      pfd.events = POLLIN;
+      int ret = poll(&pfd, 1, 1);
+      if (ret == 0) continue; // Nothing to read, restart the loop to check.
+      if (ret == -1) {
+        if (errno == EINTR) {
+          continue;
+        } else {
+          PLOG(INFO) << "Exit";
+          break;
+        }
+      }
+    }
+
     ssize_t len = read(tun_->fd(), buffer, kMTU);
     DLOG(INFO) << "Read " << len;
     if (len == -1) {
