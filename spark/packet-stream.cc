@@ -5,15 +5,15 @@
 
 namespace spark {
 
-PacketStream::PacketStream(Tun* tun, 
+PacketStream::PacketStream(Tun* tun,
                            grpc::ReaderInterface<Bullet>* reader,
                            grpc::WriterInterface<Bullet>* writer)
     : tun_(tun),
       reader_(reader),
       writer_(writer),
-      closing(false) {
+      closing_(false) {
 }
-      
+
 PacketStream::~PacketStream() {
 }
 

@@ -1,13 +1,12 @@
 #include "spark/spark-service.h"
 
 #include <grpc/grpc.h>
-#include <grpc++/channel_arguments.h>
-#include <grpc++/channel_interface.h>
+#include <grpc++/support/channel_arguments.h>
 #include <grpc++/create_channel.h>
-#include <grpc++/credentials.h>
+#include <grpc++/security/credentials.h>
 #include <grpc++/client_context.h>
-#include <grpc++/status.h>
-#include <grpc++/stream.h>
+#include <grpc++/support/status.h>
+#include <grpc++/support/sync_stream.h>
 
 #include "gflags/gflags.h"
 #include "glog/logging.h"
@@ -16,9 +15,8 @@
 DEFINE_string(server, "1.2.3.4:8080", "Address of the flame server");
 
 static void RunClient() {
-  std::shared_ptr<grpc::ChannelInterface> channel =
-      grpc::CreateChannel(FLAGS_server, grpc::InsecureCredentials(),
-                          grpc::ChannelArguments());
+  std::shared_ptr<grpc::Channel> channel =
+      grpc::CreateChannel(FLAGS_server, grpc::InsecureCredentials());
   spark::Spark::Stub client(channel);
   grpc::ClientContext ctx;
   auto stream =  client.CreateTunnel(&ctx);

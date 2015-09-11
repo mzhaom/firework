@@ -1,7 +1,7 @@
 #include "spark/spark-service.h"
 
 #include <unistd.h>
-#include <grpc++/stream.h>
+#include <grpc++/support/sync_stream.h>
 #include "spark/tun.h"
 #include "spark/packet-stream.h"
 

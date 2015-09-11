@@ -44,6 +44,7 @@ cc_library(
   deps = [
     ":rpc",
     ":tun",
+    "//third_party/grpc/upstream:grpc++",
   ]
 )
 
@@ -72,4 +73,3 @@ cc_binary(
     "//third_party/glog",
   ]
 )
-  

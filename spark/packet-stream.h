@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include <grpc++/stream.h>
+#include "grpc++/support/sync_stream.h"
 #include "spark/tun.h"
 #include "spark/rpc.pb.h"
 
@@ -9,7 +9,7 @@ namespace spark {
 
 class PacketStream {
  public:
-  PacketStream(Tun* tun, 
+  PacketStream(Tun* tun,
                grpc::ReaderInterface<Bullet>* reader,
                grpc::WriterInterface<Bullet>* writer);
   ~PacketStream();
